@@ -18,9 +18,7 @@ winget install Gyan.FFmpeg
 
 1. Open **Cursor → Customize → Plugins**
 2. **Add plugin from path** (or "Install local plugin")
-3. Select this folder: `C:\Users\darin\cursor-jarvis-tts`
-4. **Remove the old user hook** if you had one (prevents double speech):
-   - Delete `C:\Users\darin\.cursor\hooks.json` if it only contained Jarvis TTS
+3. Select this github: `https://github.com/budezllc/cursor-jarvis-tts`
 5. **Reload Cursor**
 6. Send an agent message — you should hear Jarvis after the reply finishes streaming
 
