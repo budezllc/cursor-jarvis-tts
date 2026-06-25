@@ -1,0 +1,19 @@
+{
+  "name": "jarvis-tts",
+  "owner": {
+    "name": "Kei Sakai @keisakaix",
+    "email": "kei@kunani.com"
+  },
+  "metadata": {
+    "description": "Speaks Cursor agent replies in a British Jarvis-style voice using edge-tts"
+  },
+  "plugins": [
+    {
+      "name": "jarvis-tts",
+      "source": "./",
+      "description": "Speaks agent replies in a British Jarvis-style voice using edge-tts. Debounced, deduplicated, and summarized for natural listenability.",
+      "repository": "https://github.com/budezllc/cursor-jarvis-tts",
+      "logo": "assets/logo.png"
+    }
+  ]
+}

@@ -17,9 +17,9 @@ winget install Gyan.FFmpeg
 ## Install in Cursor
 
 1. Open **Cursor → Customize → Plugins**
-2. **Add plugin from path** (or "Install local plugin")
-3. Paste in this github: `https://github.com/budezllc/cursor-jarvis-tts`
-5. **Reload Cursor**
+2. Click **+ Add** → choose **from local folder** or paste the GitHub URL: `https://github.com/budezllc/cursor-jarvis-tts`
+3. For local install, select this repo folder (must contain `.cursor-plugin/marketplace.json` and `plugin.json`)
+4. **Reload Cursor**
 6. Send an agent message — you should hear Jarvis after the reply finishes streaming
 
 ## Verify
@@ -46,7 +46,10 @@ List voices: `edge-tts --list-voices | findstr GB`
 
 ```
 cursor-jarvis-tts/
-├── .cursor-plugin/plugin.json   # Plugin manifest
+├── .cursor-plugin/
+│   ├── plugin.json              # Plugin manifest
+│   └── marketplace.json         # Required for local / multi-plugin install
+├── assets/logo.svg              # Plugin icon
 ├── hooks/hooks.json             # afterAgentResponse registration
 ├── scripts/speak-response.ps1   # TTS engine
 └── rules/jarvis-tts-setup.mdc   # Setup reminder for the agent
