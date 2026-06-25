@@ -1,6 +1,7 @@
 {
   "name": "jarvis-tts",
   "displayName": "Jarvis TTS",
+  "logo": "./assets/logo.svg",
   "version": "1.0.0",
   "description": "Speaks agent replies in a British Jarvis-style voice using edge-tts. Debounced, deduplicated, and summarized for natural listenability.",
   "author": {
