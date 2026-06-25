@@ -1,0 +1,23 @@
+---
+description: Jarvis TTS plugin prerequisites and troubleshooting on Windows
+alwaysApply: false
+---
+
+# Jarvis TTS plugin
+
+This workspace may have the **jarvis-tts** Cursor plugin enabled. It speaks agent replies via `afterAgentResponse` + edge-tts.
+
+## Dependencies
+
+- `pip install edge-tts`
+- `winget install Gyan.FFmpeg` (for `ffplay` playback)
+
+## If TTS is silent
+
+1. Check `scripts/tts.log` in the plugin install directory
+2. Check **View → Output → Hooks** in Cursor
+3. Ensure `~/.cursor/hooks.json` does not duplicate the same hook
+
+## Voice config
+
+Edit `scripts/speak-response.ps1` in the plugin folder — voice profile is at the top of the file.

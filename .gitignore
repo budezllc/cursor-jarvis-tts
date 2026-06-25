@@ -1,0 +1,3 @@
+scripts/.tts-*
+scripts/tts.log
+scripts/*.log

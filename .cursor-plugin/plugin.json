@@ -1,0 +1,23 @@
+{
+  "name": "jarvis-tts",
+  "displayName": "Jarvis TTS",
+  "version": "1.0.0",
+  "description": "Speaks agent replies in a British Jarvis-style voice using edge-tts. Debounced, deduplicated, and summarized for natural listenability.",
+  "author": {
+    "name": "Kei Sakai @keisakaix",
+    "email": "kei@kunani.com",
+    "url": "https://github.com/budezllc/cursor-jarvis-tts"
+  },
+  "license": "MIT",
+  "keywords": [
+    "tts",
+    "voice",
+    "jarvis",
+    "edge-tts",
+    "hooks",
+    "afterAgentResponse",
+    "accessibility"
+  ],
+  "category": "accessibility",
+  "hooks": "./hooks/hooks.json"
+}

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hooks": {
+    "afterAgentResponse": [
+      {
+        "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\speak-response.ps1",
+        "timeout": 30
+      }
+    ]
+  }
+}
