@@ -12,7 +12,7 @@ winget install Gyan.FFmpeg
 ```
 
 - **edge-tts** — generates speech (free Microsoft neural voices)
-- **ffmpeg / ffplay** — plays MP3 audio silently in the background
+- **ffmpeg / ffplay** — plays MP3 audio; `auto` mode also uses ffmpeg to convert MP3→WAV for Windows SoundPlayer
 
 ## Install in Cursor
 
@@ -39,6 +39,7 @@ Edit the profile at the top of `scripts/speak-response.ps1`:
 | `$MaxChars` | `500` | Max spoken characters |
 | `$MaxSentences` | `3` | Sentence cap before "more in the chat, sir" |
 | `$DebounceSec` | `2.5` | Wait for streaming to settle |
+| `$PlaybackMode` | `auto` | Audio backend: `auto`, `soundplayer`, `ffplay`, `default` |
 
 List voices: `edge-tts --list-voices | findstr GB`
 
@@ -60,6 +61,7 @@ cursor-jarvis-tts/
 | Symptom | Fix |
 |---|---|
 | No sound | Check `scripts/tts.log` for `ERROR edge-tts not found` |
+| Wrong device / silent with ffplay | Set `$PlaybackMode = 'soundplayer'` or keep `auto` (uses Windows default output) |
 | Double speech | Remove `~/.cursor/hooks.json` duplicate hook |
 | Repeating lines | Fixed via debounce + dedup; reload Cursor after update |
 | Long replies fail | Script uses file input to edge-tts (not CLI args) |

@@ -16,6 +16,7 @@ $MaxChars     = 500
 $MaxSentences = 3
 $MinChars     = 8
 $DebounceSec  = 2.5
+$PlaybackMode = 'auto'   # auto | soundplayer | ffplay | default
 $StateFile    = Join-Path $PSScriptRoot '.tts-state.json'
 $PendingFile  = Join-Path $PSScriptRoot '.tts-pending.json'
 $DebounceLock = Join-Path $PSScriptRoot '.tts-debounce.lock'
@@ -135,6 +136,36 @@ function Resolve-Ffplay {
     return $null
 }
 
+function Resolve-Ffmpeg {
+    if ($script:CachedFfmpeg -and (Test-Path $script:CachedFfmpeg)) { return $script:CachedFfmpeg }
+
+    $cmd = Get-Command ffmpeg -ErrorAction SilentlyContinue
+    if ($cmd) {
+        $script:CachedFfmpeg = $cmd.Source
+        return $script:CachedFfmpeg
+    }
+
+    $ffplay = Resolve-Ffplay
+    if ($ffplay) {
+        $ffmpeg = Join-Path (Split-Path $ffplay -Parent) 'ffmpeg.exe'
+        if (Test-Path $ffmpeg) {
+            $script:CachedFfmpeg = $ffmpeg
+            return $script:CachedFfmpeg
+        }
+    }
+
+    $winget = "$env:LOCALAPPDATA\Microsoft\WinGet\Packages"
+    if (Test-Path $winget) {
+        $found = Get-ChildItem -Path $winget -Filter 'ffmpeg.exe' -Recurse -Depth 4 -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+        if ($found) {
+            $script:CachedFfmpeg = $found.FullName
+            return $script:CachedFfmpeg
+        }
+    }
+    return $null
+}
+
 function Stop-CurrentPlayback {
     if (Test-Path $StateFile) {
         try {
@@ -220,16 +251,72 @@ function Mark-Spoken {
     }
 }
 
-function Play-AudioFile {
+function Play-ViaSoundPlayer {
+    param([string]$Path)
+
+    $FfmpegBin = Resolve-Ffmpeg
+    if (-not $FfmpegBin) { return $false }
+
+    $wavFile = [IO.Path]::ChangeExtension($Path, '.wav')
+    try {
+        & $FfmpegBin -y -loglevel quiet -i $Path -ar 44100 -ac 2 $wavFile
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path $wavFile)) { return $false }
+
+        Write-TtsLog 'PLAYBACK soundplayer'
+        $player = New-Object System.Media.SoundPlayer $wavFile
+        $player.PlaySync()
+        return $true
+    } finally {
+        if ($wavFile -and (Test-Path $wavFile)) {
+            Remove-Item $wavFile -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
+
+function Play-ViaFfplay {
     param([string]$Path)
 
     $FfplayBin = Resolve-Ffplay
-    if ($FfplayBin) {
-        & $FfplayBin -nodisp -autoexit -loglevel quiet $Path
-        return
-    }
+    if (-not $FfplayBin) { return $false }
 
+    Write-TtsLog 'PLAYBACK ffplay'
+    & $FfplayBin -nodisp -autoexit -loglevel quiet $Path
+    return $true
+}
+
+function Play-ViaDefaultApp {
+    param([string]$Path)
+
+    Write-TtsLog 'PLAYBACK default'
     Start-Process -FilePath $Path -WindowStyle Hidden
+    return $true
+}
+
+function Play-AudioFile {
+    param([string]$Path)
+
+    switch ($PlaybackMode) {
+        'soundplayer' {
+            if (-not (Play-ViaSoundPlayer -Path $Path)) {
+                Write-TtsLog 'ERROR soundplayer unavailable (ffmpeg required)'
+            }
+        }
+        'ffplay' {
+            if (-not (Play-ViaFfplay -Path $Path)) {
+                Write-TtsLog 'WARN ffplay unavailable, using default app'
+                Play-ViaDefaultApp -Path $Path
+            }
+        }
+        'default' {
+            Play-ViaDefaultApp -Path $Path
+        }
+        default {
+            if (Play-ViaSoundPlayer -Path $Path) { return }
+            if (Play-ViaFfplay -Path $Path) { return }
+            Write-TtsLog 'WARN no playback backend, using default app'
+            Play-ViaDefaultApp -Path $Path
+        }
+    }
 }
 
 function Invoke-TtsWorker {
@@ -314,6 +401,12 @@ function Invoke-DebounceWorker {
 
     Remove-Item $DebounceLock -Force -ErrorAction SilentlyContinue
     exit 0
+}
+
+$ValidPlaybackModes = @('auto', 'soundplayer', 'ffplay', 'default')
+if ($PlaybackMode -notin $ValidPlaybackModes) {
+    Write-TtsLog "WARN unknown PlaybackMode '$PlaybackMode', using auto"
+    $PlaybackMode = 'auto'
 }
 
 if ($Debounce -eq '1') {

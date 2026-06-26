@@ -10,7 +10,13 @@ This workspace may have the **jarvis-tts** Cursor plugin enabled. It speaks agen
 ## Dependencies
 
 - `pip install edge-tts`
-- `winget install Gyan.FFmpeg` (for `ffplay` playback)
+- `winget install Gyan.FFmpeg` (for `ffplay` and SoundPlayer MP3→WAV conversion)
+
+## Playback
+
+Default `$PlaybackMode` is `auto`: Windows SoundPlayer (via ffmpeg) → ffplay → Windows default app. SoundPlayer routes to the OS default audio device; ffplay/SDL often does not.
+
+Set `$PlaybackMode` in `scripts/speak-response.ps1` to force a specific backend: `soundplayer`, `ffplay`, or `default`.
 
 ## If TTS is silent
 
